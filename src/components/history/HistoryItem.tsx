@@ -1,6 +1,6 @@
 import caution_pink from "../../assets/caution_pink.svg";
 import type { HistoryProps } from "../../type/reportType";
-import { useAppSelector } from "../../hooks/useRedux";
+import useUserInfo from "../../hooks/useUserInfo";
 import { formatDay } from "../../utils/dateUtils";
 import { useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
@@ -8,7 +8,8 @@ import { formatTime } from "../../utils/dateUtils";
 
 export default function HistoryItem({ ...item }: HistoryProps) {
   const nav = useNavigate();
-  const name = useAppSelector((state) => state.patient.name);
+  const { data: userInfo } = useUserInfo();
+  const name = userInfo?.patient.name ?? "";
 
   const [action, setAction] = useState<string>("");
 

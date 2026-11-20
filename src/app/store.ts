@@ -3,19 +3,17 @@ import { combineReducers } from "redux";
 import { persistStore, persistReducer } from "redux-persist"
 import storage from "redux-persist/lib/storage";
 import authReducer from "../app/authSlice"
-import guardianReducer from "../app/guardianSlice"
-import patientReducer from "../app/patientSlice"
 
+// Redux에는 클라이언트 상태(인증)만 둔다.
+// 보호자·환자 정보는 서버 데이터라 TanStack Query(useUserInfo)로 관리
 const rootReducer = combineReducers({
   auth: authReducer,
-  guardian: guardianReducer,
-  patient: patientReducer,
 });
 
 const persistConfig = {
   key: "root",
   storage,
-  whitelist: ["auth", "guardian", "patient"], 
+  whitelist: ["auth"],
 };
 
 const persistedReducer = persistReducer(persistConfig, rootReducer);

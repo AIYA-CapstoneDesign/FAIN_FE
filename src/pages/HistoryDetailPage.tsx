@@ -3,14 +3,15 @@ import Header from "../components/common/Header";
 import { getHistoryDetail } from "../api/history";
 import { useQuery } from "@tanstack/react-query";
 import { format } from "date-fns";
-import { useAppSelector } from "../hooks/useRedux";
+import useUserInfo from "../hooks/useUserInfo";
 import { formatTime } from "../utils/dateUtils";
 import { useParams } from "react-router-dom";
 import { ko } from "date-fns/locale";
 
 export default function HistoryDetailPage() {
   const { reportId } = useParams();
-  const name = useAppSelector((state) => state.patient.name);
+  const { data: userInfo } = useUserInfo();
+  const name = userInfo?.patient.name ?? "";
 
   const { data: historyDetail } = useQuery({
     queryKey: ["historyDetail", reportId],

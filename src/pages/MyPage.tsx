@@ -7,9 +7,9 @@ import {
 } from "../type/userType";
 import { useNavigate } from "react-router-dom";
 import { clearToken } from "../app/authSlice";
-import { resetGuardian } from "../app/guardianSlice";
-import { resetPatient } from "../app/patientSlice";
-import { useAppDispatch, useAppSelector } from "../hooks/useRedux";
+import { useAppDispatch } from "../hooks/useRedux";
+import { useQueryClient } from "@tanstack/react-query";
+import useUserInfo from "../hooks/useUserInfo";
 import SideHeader from "../components/common/SideHeader";
 import { resetStore } from "../app/store";
 
@@ -17,19 +17,18 @@ export default function MyPage() {
   const nav = useNavigate();
   const dispatch = useAppDispatch();
 
-  const guardian = useAppSelector((state) => state.guardian);
-  const patient = useAppSelector((state) => state.patient);
-
-  console.log(guardian);
-  console.log(patient);
+  const queryClient = useQueryClient();
+  const { data: userInfo } = useUserInfo();
 
   const handleLogout = () => {
     dispatch(clearToken());
-    dispatch(resetGuardian());
-    dispatch(resetPatient());
+    queryClient.clear(); // 보호자·환자 정보 등 서버 데이터 캐시 삭제
     resetStore();
     nav("/login");
   };
+
+  if (!userInfo) return null;
+  const { guardian, patient } = userInfo;
 
   return (
     <>

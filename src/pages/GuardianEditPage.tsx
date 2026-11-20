@@ -3,14 +3,21 @@ import Input from "../components/common/Input";
 import EditCompleteModal from "../modals/EditCompleteModal";
 import Header from "../components/common/Header";
 import { useState } from "react";
-import { useMutation } from "@tanstack/react-query";
-import { getUserInfo, patchUserInfo } from "../api/user";
-import { setGuardian } from "../app/guardianSlice";
-import { useAppDispatch, useAppSelector } from "../hooks/useRedux";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { patchUserInfo } from "../api/user";
+import useUserInfo, { userInfoQueryKey } from "../hooks/useUserInfo";
+import type { GuardianProps } from "../type/userType";
 
 export default function GuardianEditPage() {
-  const guardian = useAppSelector((state) => state.guardian);
-  const dispatch = useAppDispatch();
+  const { data: userInfo } = useUserInfo();
+
+  // 폼 초기값으로 쓰기 위해 서버 정보를 받은 뒤에 폼을 그림
+  if (!userInfo) return null;
+  return <GuardianEditForm guardian={userInfo.guardian} />;
+}
+
+function GuardianEditForm({ guardian }: { guardian: GuardianProps }) {
+  const queryClient = useQueryClient();
 
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
   const [fName, setfName] = useState(guardian.fName);
@@ -24,8 +31,7 @@ export default function GuardianEditPage() {
         fTel: updatedData.fTel,
       }),
     onSuccess: async () => {
-      const { guardian: newGuardian } = await getUserInfo();
-      dispatch(setGuardian(newGuardian));
+      await queryClient.invalidateQueries({ queryKey: userInfoQueryKey });
       setIsModalOpen(true);
     },
   });

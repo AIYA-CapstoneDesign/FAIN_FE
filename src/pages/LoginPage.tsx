@@ -8,6 +8,8 @@ import { useNavigate } from "react-router-dom";
 import { useAppDispatch } from "../hooks/useRedux";
 import { loginUser } from "../app/authSlice";
 import { requestNotificationPermissionAndToken } from "../utils/firebase";
+import { useQueryClient } from "@tanstack/react-query";
+import { userInfoQuery } from "../hooks/useUserInfo";
 
 export default function LoginPage() {
   const [userId, setUserId] = useState<string>("");
@@ -16,6 +18,7 @@ export default function LoginPage() {
 
   const nav = useNavigate();
   const dispatch = useAppDispatch();
+  const queryClient = useQueryClient();
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -30,6 +33,8 @@ export default function LoginPage() {
 
     try {
       await dispatch(loginUser({ userId, password })).unwrap();
+      // 첫 화면(스트리밍)에서 바로 쓰도록 보호자·환자 정보를 미리 받아 둠
+      await queryClient.prefetchQuery(userInfoQuery);
       await requestNotificationPermissionAndToken();
       nav("/streaming");
     } catch {

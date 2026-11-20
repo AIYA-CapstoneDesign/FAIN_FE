@@ -26,6 +26,22 @@ export type GuardianInfo = {
     hospitalTel: string;
   };
   
+  // 서버에서 받아오는 보호자·환자 정보 (GET /mypage)
+  export type GuardianProps = {
+    userId: string;
+    fName: string;
+    fTel: string;
+  };
+
+  export type PatientProps = PatientBasicInfo &
+    PatientPhysicalInfo &
+    PatientMedicalInfo;
+
+  export type UserInfo = {
+    guardian: GuardianProps;
+    patient: PatientProps;
+  };
+
   export type InputChangeHandler = (e: React.ChangeEvent<HTMLInputElement>) => void;
 
   export type GuardianFormProps = {

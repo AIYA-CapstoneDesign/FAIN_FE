@@ -5,10 +5,9 @@ import call from "../assets/call.svg";
 import ResponseModal from "../modals/ResponseModal";
 import Streaming from "../components/streaming/Streaming";
 import Header from "../components/common/Header";
-import type { RootState } from "../app/store";
 import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
-import { useSelector } from "react-redux";
+import useUserInfo from "../hooks/useUserInfo";
 import { getEmergencyReport } from "../api/emergency";
 import { format } from "date-fns";
 import { formatTime } from "../utils/dateUtils";
@@ -22,7 +21,8 @@ export default function EmergencyPage() {
   console.log(reportId);
 
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
-  const patient = useSelector((state: RootState) => state.patient);
+  const { data: userInfo } = useUserInfo();
+  const patient = userInfo?.patient;
 
   const { data: emergencyData } = useQuery({
     queryKey: ["emergencyReport", reportId],
@@ -30,7 +30,7 @@ export default function EmergencyPage() {
     enabled: !!reportId,
   });
 
-  if (!emergencyData) return null;
+  if (!emergencyData || !patient) return null;
 
   const situationTime = new Date(emergencyData.situationTime);
 

@@ -1,7 +1,5 @@
 import instance from "./instance";
-import type { GuardianInfo, PatientBasicInfo, PatientPhysicalInfo, PatientMedicalInfo } from "../type/userType";
-import type { GuardianProps } from "../app/guardianSlice";
-import type { PatientProps } from "../app/patientSlice";
+import type { GuardianInfo, PatientBasicInfo, PatientPhysicalInfo, PatientMedicalInfo, GuardianProps, PatientProps, UserInfo } from "../type/userType";
 
 export const postSignup = async (formData: GuardianInfo & PatientBasicInfo & PatientPhysicalInfo & PatientMedicalInfo) => {
   const res = await instance.post('/signup', formData);
@@ -21,7 +19,7 @@ export const patchUserInfo = async (updatedData: Partial<GuardianProps> & Partia
   return res.data;
 };
 
-export const getUserInfo = async () => {
+export const getUserInfo = async (): Promise<UserInfo> => {
   const res = await instance.get("/mypage");
   console.log("getUserInfo: ", res.data);
   return res.data.data;

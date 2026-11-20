@@ -1,7 +1,5 @@
 import { createSlice, createAsyncThunk, type PayloadAction } from "@reduxjs/toolkit";
-import { getUserInfo, postLogin } from "../api/user";
-import { setGuardian } from "./guardianSlice";
-import { setPatient } from "./patientSlice";
+import { postLogin } from "../api/user";
 
 type AuthState = {
   token: string | null;
@@ -43,10 +41,6 @@ export const loginUser = createAsyncThunk(
       }
 
       dispatch(setToken(res.data.token));
-
-      const info = await getUserInfo();
-      dispatch(setGuardian(info.guardian));
-      dispatch(setPatient(info.patient));
 
       return res.data;
     } catch {

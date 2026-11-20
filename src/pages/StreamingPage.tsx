@@ -2,12 +2,14 @@ import Streaming from "../components/streaming/Streaming";
 import PatientBasicInfo from "../components/streaming/PatientBasicInfo";
 import PatientMedicalInfo from "../components/streaming/PatientMedicalInfo";
 import PatientPhysicalInfo from "../components/streaming/PatientPhysicalInfo";
-import { useAppSelector } from "../hooks/useRedux";
-import type { RootState } from "../app/store";
 import SideHeader from "../components/common/SideHeader";
+import useUserInfo from "../hooks/useUserInfo";
 
 export default function StreamingPage() {
-  const patient = useAppSelector((state: RootState) => state.patient);
+  const { data: userInfo } = useUserInfo();
+  const patient = userInfo?.patient;
+
+  if (!patient) return null;
 
   return (
     <>

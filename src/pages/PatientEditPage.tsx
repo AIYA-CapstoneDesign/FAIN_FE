@@ -9,14 +9,21 @@ import type { DaumPostcodeData } from "../components/common/CustomPostcode";
 import { fullAddress, parseAddress } from "../utils/addressUtils";
 import { PATIENT_INFO_CONFIG } from "../type/userType";
 import { useState, useEffect } from "react";
-import { useAppDispatch, useAppSelector } from "../hooks/useRedux";
-import { useMutation } from "@tanstack/react-query";
-import { patchUserInfo, getUserInfo } from "../api/user";
-import { setPatient } from "../app/patientSlice";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { patchUserInfo } from "../api/user";
+import useUserInfo, { userInfoQueryKey } from "../hooks/useUserInfo";
+import type { PatientProps } from "../type/userType";
 
 export default function PatientEditPage() {
-  const patient = useAppSelector((state) => state.patient);
-  const dispatch = useAppDispatch();
+  const { data: userInfo } = useUserInfo();
+
+  // 폼 초기값으로 쓰기 위해 서버 정보를 받은 뒤에 폼을 그림
+  if (!userInfo) return null;
+  return <PatientEditForm patient={userInfo.patient} />;
+}
+
+function PatientEditForm({ patient }: { patient: PatientProps }) {
+  const queryClient = useQueryClient();
 
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
   const [showPostcode, setShowPostcode] = useState<boolean>(false);
@@ -40,8 +47,7 @@ export default function PatientEditPage() {
   const mutation = useMutation({
     mutationFn: () => patchUserInfo(formData),
     onSuccess: async () => {
-      const { patient: newPatient } = await getUserInfo();
-      dispatch(setPatient(newPatient));
+      await queryClient.invalidateQueries({ queryKey: userInfoQueryKey });
       setIsModalOpen(true);
     },
     onError: (err) => {
