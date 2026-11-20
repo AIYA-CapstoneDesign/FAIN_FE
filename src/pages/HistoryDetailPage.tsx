@@ -7,14 +7,16 @@ import { useAppSelector } from "../hooks/useRedux";
 import { formatTime } from "../utils/dateUtils";
 import { useParams } from "react-router-dom";
 import { ko } from "date-fns/locale";
+import { queryKeys, STALE_TIME } from "../api/queryConfig";
 
 export default function HistoryDetailPage() {
   const { reportId } = useParams();
   const name = useAppSelector((state) => state.patient.name);
 
   const { data: historyDetail } = useQuery({
-    queryKey: ["historyDetail", reportId],
+    queryKey: queryKeys.historyDetail(Number(reportId)),
     queryFn: () => getHistoryDetail(Number(reportId)),
+    staleTime: STALE_TIME.history,
   });
 
   if (!historyDetail) return null;

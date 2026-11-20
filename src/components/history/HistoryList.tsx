@@ -1,11 +1,13 @@
 import HistoryMonthlyList from "./HistoryMonthlyList";
 import { getHistoryList } from "../../api/history";
 import { useQuery } from "@tanstack/react-query";
+import { queryKeys, STALE_TIME } from "../../api/queryConfig";
 
 export default function HistoryList() {
   const { data: historyList } = useQuery({
-    queryKey: ["history"],
+    queryKey: queryKeys.historyList(),
     queryFn: () => getHistoryList(),
+    staleTime: STALE_TIME.history,
   });
 
   if (!Array.isArray(historyList) || historyList.length === 0) {

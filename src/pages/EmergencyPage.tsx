@@ -14,6 +14,7 @@ import { format } from "date-fns";
 import { formatTime } from "../utils/dateUtils";
 import { useParams } from "react-router-dom";
 import { ko } from "date-fns/locale";
+import { queryKeys, STALE_TIME, GC_TIME } from "../api/queryConfig";
 
 export default function EmergencyPage() {
   const { reportId } = useParams();
@@ -25,9 +26,11 @@ export default function EmergencyPage() {
   const patient = useSelector((state: RootState) => state.patient);
 
   const { data: emergencyData } = useQuery({
-    queryKey: ["emergencyReport", reportId],
+    queryKey: queryKeys.emergencyReport(id),
     queryFn: () => getEmergencyReport(id),
     enabled: !!reportId,
+    staleTime: STALE_TIME.emergencyReport,
+    gcTime: GC_TIME,
   });
 
   if (!emergencyData) return null;

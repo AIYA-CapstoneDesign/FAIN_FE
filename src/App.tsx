@@ -3,6 +3,8 @@ import { useEffect, useState } from "react";
 import { useAppSelector } from "./hooks/useRedux";
 import { messaging } from "./utils/firebase";
 import { onMessage } from "firebase/messaging";
+import { useQueryClient } from "@tanstack/react-query";
+import { queryKeys } from "./api/queryConfig";
 import AppRoutes from "./AppRoutes";
 import Navigation from "./components/common/Navigation";
 import EmergencyModal from "./modals/EmergencyModal";
@@ -13,6 +15,7 @@ export default function App() {
   const nav = useNavigate();
   const loc = useLocation();
   const isAuthenticated = useAppSelector((state) => state.auth.isAuthenticated);
+  const queryClient = useQueryClient();
 
   const [isEmergency, setIsEmergency] = useState<boolean>(false);
   const [reportId, setReportId] = useState<number | null>(null);
@@ -44,8 +47,12 @@ export default function App() {
   }, []);
 
   useEffect(() => {
-    onMessage(messaging, (payload) => {
+    const unsubscribe = onMessage(messaging, (payload) => {
       console.log("포그라운드 FCM 메시지 수신:", payload);
+
+      // 새 낙상이 생겼으므로 히스토리·월간 통계 캐시를 무효화
+      queryClient.invalidateQueries({ queryKey: queryKeys.historyAll });
+      queryClient.invalidateQueries({ queryKey: queryKeys.monthAll });
 
       if (payload.data) {
         try {
@@ -62,7 +69,9 @@ export default function App() {
 
       setIsEmergency(true);
     });
-  }, []);
+
+    return unsubscribe;
+  }, [queryClient]);
 
   useEffect(() => {
     const isRootPath =

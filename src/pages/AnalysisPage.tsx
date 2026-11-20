@@ -6,6 +6,7 @@ import SideHeader from "../components/common/SideHeader";
 import { useState } from "react";
 import { getSummary, getGraph, getReport } from "../api/analysis";
 import { useQuery } from "@tanstack/react-query";
+import { queryKeys, STALE_TIME, GC_TIME } from "../api/queryConfig";
 
 export default function AnlaysisPage() {
   const currentYear = new Date().getFullYear();
@@ -33,18 +34,24 @@ export default function AnlaysisPage() {
   };
 
   const { data: summary, isLoading: isSummaryLoading } = useQuery({
-    queryKey: ["summary", selectedYear, selectedMonth],
+    queryKey: queryKeys.monthSummary(selectedYear, selectedMonth),
     queryFn: () => getSummary(selectedYear, selectedMonth),
+    staleTime: STALE_TIME.monthly,
+    gcTime: GC_TIME,
   });
 
   const { data: graphData, isLoading: isGraphLoading } = useQuery({
-    queryKey: ["graph", selectedYear, selectedMonth],
+    queryKey: queryKeys.monthGraph(selectedYear, selectedMonth),
     queryFn: () => getGraph(selectedYear, selectedMonth),
+    staleTime: STALE_TIME.monthly,
+    gcTime: GC_TIME,
   });
 
   const { data: report, isLoading: isReportLoading } = useQuery({
-    queryKey: ["report", selectedYear, selectedMonth],
+    queryKey: queryKeys.monthReport(selectedYear, selectedMonth),
     queryFn: () => getReport(selectedYear, selectedMonth),
+    staleTime: STALE_TIME.monthly,
+    gcTime: GC_TIME,
   });
 
   const isLoading = isSummaryLoading || isGraphLoading || isReportLoading;
